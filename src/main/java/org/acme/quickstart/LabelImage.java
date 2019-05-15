@@ -71,7 +71,7 @@ public class LabelImage {
   private static ArrayList<String> loadLabels() throws IOException {
     ArrayList<String> labels = new ArrayList<String>();
     String line;
-    final InputStream is = LabelImage.class.getClassLoader().getResourceAsStream("/labels.txt");
+    final InputStream is = LabelImage.class.getClassLoader().getResourceAsStream("labels.txt");
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
       while ((line = reader.readLine()) != null) {
         labels.add(line);
