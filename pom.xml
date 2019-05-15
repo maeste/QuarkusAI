@@ -102,6 +102,7 @@
                 <configuration>
                   <enableHttpUrlHandler>true</enableHttpUrlHandler>
                   <enableJni>true</enableJni>
+                  <additionalBuildArgs>-H:IncludeResources=.*\.pb|.*\.txt</additionalBuildArgs>
                 </configuration>
               </execution>
             </executions>
