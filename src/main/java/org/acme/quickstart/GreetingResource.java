@@ -33,15 +33,29 @@ public class GreetingResource {
         return service.greeting(name);
     }
     @POST
-    @Path("/loadImage")
+    @Path("/labelImage")
     @Consumes("multipart/form-data")
     public Response loadImage(MultipartFormDataInput input) throws Exception {
         Map<String, List<InputPart>> formParts = input.getFormDataMap();
         File f = storeWalletFile(formParts.get("file").iterator().next());
         //String password = formParts.get("password").iterator().next().getBodyAsString();
         byte[] bytes = Files.readAllBytes(Paths.get(f.getAbsolutePath()));
+        long before = System.currentTimeMillis();
         String returnString = (new LabelImage()).labelImage(f.getName(), bytes);
-        return Response.status(200).entity("labeled image = " + returnString).build();
+        return Response.status(200).entity("labeled image = " + returnString + "time=" + (System.currentTimeMillis() - before)).build();
+    }
+
+    @POST
+    @Path("/labelImageStatic")
+    @Consumes("multipart/form-data")
+    public Response loadImageStatic(MultipartFormDataInput input) throws Exception {
+        Map<String, List<InputPart>> formParts = input.getFormDataMap();
+        File f = storeWalletFile(formParts.get("file").iterator().next());
+        //String password = formParts.get("password").iterator().next().getBodyAsString();
+        byte[] bytes = Files.readAllBytes(Paths.get(f.getAbsolutePath()));
+        long before = System.currentTimeMillis();
+        String returnString = (new LabelImageStatic()).labelImageStatic(f.getName(), bytes);
+        return Response.status(200).entity("labeled image (static)= " + returnString + "time=" + (System.currentTimeMillis() - before)).build();
     }
 
     private File storeWalletFile(InputPart inputPart) throws IOException {

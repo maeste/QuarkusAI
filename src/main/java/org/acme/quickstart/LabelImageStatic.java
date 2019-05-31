@@ -14,7 +14,6 @@ limitations under the License.
 ==============================================================================*/
 
 import com.google.common.io.ByteStreams;
-import org.apache.commons.io.output.StringBuilderWriter;
 import org.tensorflow.Graph;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
@@ -24,8 +23,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,19 +30,28 @@ import java.util.List;
  * Simplified version of
  * https://github.com/tensorflow/tensorflow/blob/r1.4/tensorflow/java/src/main/java/org/tensorflow/examples/LabelImage.java
  */
-public class LabelImage {
+public class LabelImageStatic {
 
+  private static Graph staticGraph;
+  private static Session staticSession;
+  private static List<String> labels;
+  static {
+    try {
+      staticGraph = new Graph();
+      staticSession = new Session(staticGraph);
+      staticGraph.importGraphDef(loadGraphDef());
+      labels = loadLabels();
 
-  public String labelImage(String fileName, byte[] bytes) throws Exception {
-    final List<String> labels = loadLabels();
-    try (Graph graph = new Graph();
-        Session session = new Session(graph)) {
-      graph.importGraphDef(loadGraphDef());
+    } catch (Exception e) {
 
+    }
+  }
+
+  public String labelImageStatic(String fileName, byte[] bytes) throws Exception {
       float[] probabilities = null;
       try (Tensor<String> input = Tensors.create(bytes);
            Tensor<Float> output =
-                   session
+                   staticSession
                            .runner()
                            .feed("encoded_image_bytes", input)
                            .fetch("probabilities")
@@ -61,20 +67,19 @@ public class LabelImage {
                 fileName, labels.get(label), probabilities[label] * 100.0);
       }
 
-    }
+
   }
 
-
   private static byte[] loadGraphDef() throws IOException {
-    try (InputStream is = LabelImage.class.getClassLoader().getResourceAsStream("graph.pb")) {
+    try (InputStream is = LabelImageStatic.class.getClassLoader().getResourceAsStream("graph.pb")) {
       return ByteStreams.toByteArray(is);
     }
   }
 
-  private ArrayList<String> loadLabels() throws IOException {
+  private static ArrayList<String> loadLabels() throws IOException {
     ArrayList<String> labels = new ArrayList<String>();
     String line;
-    final InputStream is = LabelImage.class.getClassLoader().getResourceAsStream("labels.txt");
+    final InputStream is = LabelImageStatic.class.getClassLoader().getResourceAsStream("labels.txt");
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
       while ((line = reader.readLine()) != null) {
         labels.add(line);
