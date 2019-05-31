@@ -102,7 +102,10 @@
                 <configuration>
                   <enableHttpUrlHandler>true</enableHttpUrlHandler>
                   <enableJni>true</enableJni>
-                  <additionalBuildArgs>-H:IncludeResources=.*\.pb|.*\.txt</additionalBuildArgs>
+                  <additionalBuildArgs>
+                    <additionalBuildArg>--delay-class-initialization-to-runtime=org.tensorflow.Graph</additionalBuildArg>
+                    <additionalBuildArg>-H:IncludeResources=.*\.pb|.*\.txt</additionalBuildArg>
+                  </additionalBuildArgs>
                 </configuration>
               </execution>
             </executions>

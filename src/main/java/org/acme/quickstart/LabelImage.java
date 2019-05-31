@@ -34,7 +34,7 @@ import java.util.List;
  * https://github.com/tensorflow/tensorflow/blob/r1.4/tensorflow/java/src/main/java/org/tensorflow/examples/LabelImage.java
  */
 public class LabelImage {
-  public static String labelImage(String fileName, byte[] bytes) throws Exception {
+  public String labelImage(String fileName, byte[] bytes) throws Exception {
     final List<String> labels = loadLabels();
     try (Graph graph = new Graph();
         Session session = new Session(graph)) {
@@ -62,13 +62,13 @@ public class LabelImage {
     }
   }
 
-  private static byte[] loadGraphDef() throws IOException {
+  private byte[] loadGraphDef() throws IOException {
     try (InputStream is = LabelImage.class.getClassLoader().getResourceAsStream("graph.pb")) {
       return ByteStreams.toByteArray(is);
     }
   }
 
-  private static ArrayList<String> loadLabels() throws IOException {
+  private ArrayList<String> loadLabels() throws IOException {
     ArrayList<String> labels = new ArrayList<String>();
     String line;
     final InputStream is = LabelImage.class.getClassLoader().getResourceAsStream("labels.txt");
@@ -80,7 +80,7 @@ public class LabelImage {
     return labels;
   }
 
-  private static int argmax(float[] probabilities) {
+  private int argmax(float[] probabilities) {
     int best = 0;
     for (int i = 1; i < probabilities.length; ++i) {
       if (probabilities[i] > probabilities[best]) {

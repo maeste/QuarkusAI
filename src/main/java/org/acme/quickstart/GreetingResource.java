@@ -40,7 +40,7 @@ public class GreetingResource {
         File f = storeWalletFile(formParts.get("file").iterator().next());
         //String password = formParts.get("password").iterator().next().getBodyAsString();
         byte[] bytes = Files.readAllBytes(Paths.get(f.getAbsolutePath()));
-        String returnString = LabelImage.labelImage(f.getName(), bytes);
+        String returnString = (new LabelImage()).labelImage(f.getName(), bytes);
         return Response.status(200).entity("labeled image = " + returnString).build();
     }
 
