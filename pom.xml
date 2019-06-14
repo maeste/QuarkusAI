@@ -103,9 +103,6 @@
                   <enableHttpUrlHandler>true</enableHttpUrlHandler>
                   <enableJni>true</enableJni>
                   <additionalBuildArgs>
-                    <!--Next line avoid "No instances are allowed in the image heap for a class that is initialized or reinitialized at image runtime" -->
-                    <additionalBuildArg>--delay-class-initialization-to-runtime=org.acme.quickstart.LabelImageStatic</additionalBuildArg>
-                    <additionalBuildArg>--delay-class-initialization-to-runtime=org.tensorflow.Graph</additionalBuildArg>
                     <additionalBuildArg>-H:IncludeResources=.*\.pb|.*\.txt</additionalBuildArg>
                   </additionalBuildArgs>
                 </configuration>

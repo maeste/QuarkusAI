@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -35,8 +36,10 @@ import java.util.List;
  */
 public class LabelImage {
 
+	private static volatile boolean reloaded = false;
 
   public String labelImage(String fileName, byte[] bytes) throws Exception {
+	graalVmHack();
     final List<String> labels = loadLabels();
     try (Graph graph = new Graph();
         Session session = new Session(graph)) {
@@ -64,7 +67,15 @@ public class LabelImage {
     }
   }
 
+  private void graalVmHack() throws Exception {
+	  if (reloaded) return;
+	  Method tfInit = Class.forName("org.tensorflow.TensorFlow").getDeclaredMethod("init");
+      tfInit.setAccessible(true);
+      tfInit.invoke(null);
+      reloaded = true;
+  }
 
+  
   private static byte[] loadGraphDef() throws IOException {
     try (InputStream is = LabelImage.class.getClassLoader().getResourceAsStream("graph.pb")) {
       return ByteStreams.toByteArray(is);
