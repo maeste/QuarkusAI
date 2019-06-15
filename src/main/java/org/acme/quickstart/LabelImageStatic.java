@@ -41,6 +41,7 @@ public class LabelImageStatic {
       staticSession = new Session(staticGraph);
       staticGraph.importGraphDef(loadGraphDef());
       labels = loadLabels();
+      //Tensor.create(Integer.valueOf(1));
 
     } catch (Exception e) {
 
@@ -49,6 +50,7 @@ public class LabelImageStatic {
 
   public String labelImageStatic(String fileName, byte[] bytes) throws Exception {
       float[] probabilities = null;
+
       try (Tensor<String> input = Tensors.create(bytes);
            Tensor<Float> output =
                    staticSession
