@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class LabelImageStatic {
   private static Graph staticGraph;
   private static Session staticSession;
   private static List<String> labels;
+  private static volatile boolean reloaded = false;
   static {
     try {
       staticGraph = new Graph();
@@ -48,6 +50,7 @@ public class LabelImageStatic {
   }
 
   public String labelImageStatic(String fileName, byte[] bytes) throws Exception {
+	  graalVmHack();
       float[] probabilities = null;
       try (Tensor<String> input = Tensors.create(bytes);
            Tensor<Float> output =
@@ -68,6 +71,14 @@ public class LabelImageStatic {
       }
 
 
+  }
+  
+  private void graalVmHack() throws Exception {
+	  if (reloaded) return;
+	  Method tfInit = Class.forName("org.tensorflow.TensorFlow").getDeclaredMethod("init");
+      tfInit.setAccessible(true);
+      tfInit.invoke(null);
+      reloaded = true;
   }
 
   private static byte[] loadGraphDef() throws IOException {
