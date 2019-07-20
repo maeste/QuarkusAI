@@ -54,7 +54,7 @@ public class GreetingResource {
         //String password = formParts.get("password").iterator().next().getBodyAsString();
         byte[] bytes = Files.readAllBytes(Paths.get(f.getAbsolutePath()));
         long before = System.currentTimeMillis();
-        String returnString = (new LabelImageStatic()).labelImageStatic(f.getName(), bytes);
+        String returnString = (new LabelImageStatic()).labelImage(f.getName(), bytes);
         return Response.status(200).entity("labeled image (static)= " + returnString + "time=" + (System.currentTimeMillis() - before)).build();
     }
 

@@ -20,7 +20,6 @@ import org.tensorflow.Tensor;
 import org.tensorflow.Tensors;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
@@ -33,45 +32,37 @@ import java.util.List;
  */
 public class LabelImageStatic {
 
-  private static Graph staticGraph;
-  private static Session staticSession;
-  private static List<String> labels;
+  private static List<String> labels = loadLabels();
   private static volatile boolean reloaded = false;
-  static {
-    try {
-      staticGraph = new Graph();
-      staticSession = new Session(staticGraph);
-      staticGraph.importGraphDef(loadGraphDef());
-      labels = loadLabels();
+  private static byte[] graphDef = loadGraphDef();
+  
+  public String labelImage(String fileName, byte[] bytes) throws Exception {
+		graalVmHack();
+	    try (Graph graph = new Graph();
+	      Session session = new Session(graph)) {
+	      graph.importGraphDef(graphDef);
 
-    } catch (Exception e) {
+	      float[] probabilities = null;
+	      try (Tensor<String> input = Tensors.create(bytes);
+	           Tensor<Float> output =
+	                   session
+	                           .runner()
+	                           .feed("encoded_image_bytes", input)
+	                           .fetch("probabilities")
+	                           .run()
+	                           .get(0)
+	                           .expect(Float.class)) {
+	        if (probabilities == null) {
+	          probabilities = new float[(int) output.shape()[0]];
+	        }
+	        output.copyTo(probabilities);
+	        int label = argmax(probabilities);
+	        return String.format("%-30s --> %-15s (%.2f%% likely)\n",
+	                fileName, labels.get(label), probabilities[label] * 100.0);
+	      }
 
-    }
-  }
-
-  public String labelImageStatic(String fileName, byte[] bytes) throws Exception {
-	  graalVmHack();
-      float[] probabilities = null;
-      try (Tensor<String> input = Tensors.create(bytes);
-           Tensor<Float> output =
-                   staticSession
-                           .runner()
-                           .feed("encoded_image_bytes", input)
-                           .fetch("probabilities")
-                           .run()
-                           .get(0)
-                           .expect(Float.class)) {
-        if (probabilities == null) {
-          probabilities = new float[(int) output.shape()[0]];
-        }
-        output.copyTo(probabilities);
-        int label = argmax(probabilities);
-        return String.format("%-30s --> %-15s (%.2f%% likely)\n",
-                fileName, labels.get(label), probabilities[label] * 100.0);
-      }
-
-
-  }
+	    }
+	  }
   
   private void graalVmHack() throws Exception {
 	  if (reloaded) return;
@@ -81,22 +72,28 @@ public class LabelImageStatic {
       reloaded = true;
   }
 
-  private static byte[] loadGraphDef() throws IOException {
+  private static byte[] loadGraphDef() {
     try (InputStream is = LabelImageStatic.class.getClassLoader().getResourceAsStream("graph.pb")) {
       return ByteStreams.toByteArray(is);
-    }
+    } catch (Exception e) {
+		throw new RuntimeException(e);
+	}
   }
 
-  private static ArrayList<String> loadLabels() throws IOException {
-    ArrayList<String> labels = new ArrayList<String>();
-    String line;
-    final InputStream is = LabelImageStatic.class.getClassLoader().getResourceAsStream("labels.txt");
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-      while ((line = reader.readLine()) != null) {
-        labels.add(line);
-      }
-    }
-    return labels;
+  private static ArrayList<String> loadLabels() {
+	try {
+	    ArrayList<String> labels = new ArrayList<String>();
+	    String line;
+	    final InputStream is = LabelImageStatic.class.getClassLoader().getResourceAsStream("labels.txt");
+	    try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+	      while ((line = reader.readLine()) != null) {
+	        labels.add(line);
+	      }
+	    }
+	    return labels;
+	} catch (Exception e) {
+		throw new RuntimeException(e);
+	}
   }
 
   private int argmax(float[] probabilities) {
