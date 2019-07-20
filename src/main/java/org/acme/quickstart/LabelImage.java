@@ -14,7 +14,6 @@ limitations under the License.
 ==============================================================================*/
 
 import com.google.common.io.ByteStreams;
-import org.apache.commons.io.output.StringBuilderWriter;
 import org.tensorflow.Graph;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
@@ -25,8 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
