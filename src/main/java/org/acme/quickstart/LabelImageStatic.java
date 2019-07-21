@@ -13,18 +13,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-import com.google.common.io.ByteStreams;
-import org.tensorflow.Graph;
-import org.tensorflow.Session;
-import org.tensorflow.Tensor;
-import org.tensorflow.Tensors;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.tensorflow.Graph;
+import org.tensorflow.Session;
+import org.tensorflow.Tensor;
+import org.tensorflow.Tensors;
+
+import com.google.common.io.ByteStreams;
 
 /**
  * Simplified version of
@@ -36,33 +37,36 @@ public class LabelImageStatic {
   private static volatile boolean reloaded = false;
   private static byte[] graphDef = loadGraphDef();
   
-  public String labelImage(String fileName, byte[] bytes) throws Exception {
+  private static volatile Session s;
+  
+  private static void initSession() {
+		if (s == null) {
+			synchronized (LabelImageStatic.class) {
+				if (s == null) {
+					Graph graph = new Graph();
+					graph.importGraphDef(graphDef);
+					s = new Session(graph);
+				}
+			}
+		}
+  }
+  
+	public String labelImage(String fileName, byte[] bytes) throws Exception {
 		graalVmHack();
-	    try (Graph graph = new Graph();
-	      Session session = new Session(graph)) {
-	      graph.importGraphDef(graphDef);
-
-	      float[] probabilities = null;
-	      try (Tensor<String> input = Tensors.create(bytes);
-	           Tensor<Float> output =
-	                   session
-	                           .runner()
-	                           .feed("encoded_image_bytes", input)
-	                           .fetch("probabilities")
-	                           .run()
-	                           .get(0)
-	                           .expect(Float.class)) {
-	        if (probabilities == null) {
-	          probabilities = new float[(int) output.shape()[0]];
-	        }
-	        output.copyTo(probabilities);
-	        int label = argmax(probabilities);
-	        return String.format("%-30s --> %-15s (%.2f%% likely)\n",
-	                fileName, labels.get(label), probabilities[label] * 100.0);
-	      }
-
-	    }
-	  }
+		initSession();
+		float[] probabilities = null;
+		try (Tensor<String> input = Tensors.create(bytes);
+				Tensor<Float> output = s.runner().feed("encoded_image_bytes", input).fetch("probabilities").run().get(0)
+						.expect(Float.class)) {
+			if (probabilities == null) {
+				probabilities = new float[(int) output.shape()[0]];
+			}
+			output.copyTo(probabilities);
+			int label = argmax(probabilities);
+			return String.format("%-30s --> %-15s (%.2f%% likely)\n", fileName, labels.get(label),
+					probabilities[label] * 100.0);
+		}
+	}
   
   private void graalVmHack() throws Exception {
 	  if (reloaded) return;
@@ -105,9 +109,5 @@ public class LabelImageStatic {
     }
     return best;
   }
-
-
-
-
 
 }
