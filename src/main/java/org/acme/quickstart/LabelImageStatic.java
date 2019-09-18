@@ -35,7 +35,7 @@ public class LabelImageStatic {
 
   private static List<String> labels = loadLabels();
   private static volatile boolean reloaded = false;
-  private static byte[] graphDef = loadGraphDef();
+  private static byte[] graphDef = warmUpAndDumpGraphDef();
   
   private static volatile Session s;
   
@@ -56,12 +56,8 @@ public class LabelImageStatic {
 		initSession();
 		float[] probabilities = null;
 		try (Tensor<String> input = Tensors.create(bytes);
-				Tensor<Float> output = s.runner().feed("encoded_image_bytes", input).fetch("probabilities").run().get(0)
-						.expect(Float.class)) {
-			if (probabilities == null) {
-				probabilities = new float[(int) output.shape()[0]];
-			}
-			output.copyTo(probabilities);
+				Tensor<Float> output = feedAndRun(s, input)) {
+			probabilities = extractProbabilities(output);
 			int label = argmax(probabilities);
 			return String.format("%-30s --> %-15s (%.2f%% likely)\n", fileName, labels.get(label),
 					probabilities[label] * 100.0);
@@ -75,17 +71,43 @@ public class LabelImageStatic {
       tfInit.invoke(null);
       reloaded = true;
   }
+  
+  private static Tensor<Float> feedAndRun(Session session, Tensor<String> input) {
+	  return session.runner().feed("encoded_image_bytes", input).fetch("probabilities").run().get(0)
+				.expect(Float.class);
+  }
+  
+	private static float[] extractProbabilities(Tensor<Float> output) {
+		float[] probabilities = new float[(int) output.shape()[0]];
+		output.copyTo(probabilities);
+		return probabilities;
+	}
+  
+  private static byte[] warmUpAndDumpGraphDef() {
+	  Graph graph = new Graph();
+	  graph.importGraphDef(loadBytes("graph.pb"));
+	  try (Session ss = new Session(graph);
+			  Tensor<String> input = Tensors.create(loadBytes("bg.png"));
+			  Tensor<Float> output = feedAndRun(ss, input)) {
+			float[] probabilities = extractProbabilities(output);
+			int label = argmax(probabilities);
+			System.out.println(String.format("Warm-up: %-15s (%.2f%% likely)", labels.get(label), probabilities[label] * 100.0));
+			return graph.toGraphDef();
+	  }
+  }
 
-  private static byte[] loadGraphDef() {
-    try (InputStream is = LabelImageStatic.class.getClassLoader().getResourceAsStream("graph.pb")) {
+  private static byte[] loadBytes(String resource) {
+	  System.out.println("Load bytes: " + resource);
+    try (InputStream is = LabelImageStatic.class.getClassLoader().getResourceAsStream(resource)) {
       return ByteStreams.toByteArray(is);
     } catch (Exception e) {
 		throw new RuntimeException(e);
 	}
   }
-
+  
   private static ArrayList<String> loadLabels() {
 	try {
+		System.out.println("Load labels!");
 	    ArrayList<String> labels = new ArrayList<String>();
 	    String line;
 	    final InputStream is = LabelImageStatic.class.getClassLoader().getResourceAsStream("labels.txt");
@@ -100,7 +122,7 @@ public class LabelImageStatic {
 	}
   }
 
-  private int argmax(float[] probabilities) {
+  private static int argmax(float[] probabilities) {
     int best = 0;
     for (int i = 1; i < probabilities.length; ++i) {
       if (probabilities[i] > probabilities[best]) {
