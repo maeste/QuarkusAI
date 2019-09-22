@@ -1,6 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
-<script>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<title>Quarkus AI</title>
+</head>
+<body>
+  <script type="text/javascript">
   function doSubmit(){
     // Form Data
     var formData = new FormData();
@@ -13,31 +19,47 @@
 
     // Http Request  
     var request = new XMLHttpRequest();
-<!--    request.open('POST', "http://localhost:8080/quarkusai/" + input1.value); -->
-    request.open('POST', "http://localhost:8080/quarkusai/labelImageNative");
-    request.setRequestHeader("Accept", "text/plain");
-    request.send(formData);
-
     request.onreadystatechange = function() {
+        if (this.readyState == 1) {
+            document.getElementById("result-holder").innerHTML = "Waiting...";
+        }
         if (this.readyState == 4 && this.status == 200) {
             document.getElementById("result-holder").innerHTML = this.responseText;
        }
     }
+<!--    request.open('POST', "http://localhost:8080/quarkusai/" + input1.value); -->
+    request.open('POST', "http://localhost:8080/quarkusai/labelImageNative");
+    request.setRequestHeader("Accept", "text/plain");
+    request.send(formData);
   }
-</script>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Quarkus AI</title>
-</head>
-<body>
+  </script>
   <h1>Test page for Native execution</h1>
   <form>
      <!--<input type="text" id="input1" value="labelImageNative"/>-->
-     image file: <input type="file" name="file" id="fileSelect" size="50"/>
+     <input type="file" name="file" id="fileSelect" size="50"/>
      <button type="button" onclick="doSubmit()">Process</button>
      <br/>
-     <div id="result-holder"></div>
   </form>
-  <br/><br/>
+  <br/>
+  <div><img src="" id="preview-img-holder" width="400px" /></div>
+  <br/>
+  <div id="result-holder"></div>
+  
+  <script type="text/javascript">
+    function readURL(input) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#preview-img-holder').attr('src', e.target.result);
+        }
+        reader.readAsDataURL(input.files[0]);
+        document.getElementById("result-holder").innerHTML = "";
+      }
+    }
+    $("#fileSelect").on('change', function(){
+      readURL(this);
+    });
+  </script>
+  
 </body>
 </html>
