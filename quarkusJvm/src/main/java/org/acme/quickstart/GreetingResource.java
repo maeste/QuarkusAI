@@ -3,13 +3,15 @@ package org.acme.quickstart;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -18,15 +20,16 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 public class GreetingResource {
 
     @POST
-    @Path("/labelImageJvm")
+    @Path("/labelImageJvm/{results}")
     @Consumes("multipart/form-data")
-    public Response loadImage(@HeaderParam("Content-Length") String contentLength, MultipartFormDataInput input) throws Exception {
+    @Produces("application/json")
+    public ImageProcessingResult loadImage(@HeaderParam("Content-Length") String contentLength, @PathParam("results") int results, MultipartFormDataInput input) throws Exception {
         long before = System.currentTimeMillis();
         InputPart inputPart = input.getFormDataMap().get("file").iterator().next();
         String fileName = parseFileName(inputPart.getHeaders());
         byte[] bytes = streamToByte(inputPart.getBody(InputStream.class, null), Integer.parseInt(contentLength));
-        String returnString = LabelImage.labelImage(fileName, bytes);
-        return Response.status(200).entity("labeled image (JVM) = " + returnString + "time=" + (System.currentTimeMillis() - before)).build();
+        List<Probability> probs = LabelImage.labelImage(fileName, bytes).subList(0, results);
+        return new ImageProcessingResult((System.currentTimeMillis() - before), probs);
     }
 
     // Parse Content-Disposition header to get the original file name

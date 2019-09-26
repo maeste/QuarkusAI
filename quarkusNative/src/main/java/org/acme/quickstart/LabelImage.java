@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.tensorflow.Graph;
@@ -38,7 +39,7 @@ public final class LabelImage
       }
    }
 
-   public static String labelImage(String fileName, byte[] bytes) throws Exception
+   public static List<Probability> labelImage(String fileName, byte[] bytes) throws Exception
    {
       graalVmHack();
       initSession();
@@ -46,9 +47,17 @@ public final class LabelImage
       try (Tensor<String> input = Tensors.create(bytes); Tensor<Float> output = feedAndRun(s, input))
       {
          probabilities = extractProbabilities(output);
-         int label = argmax(probabilities);
-         return String.format("%-30s --> %-15s (%.2f%% likely)\n", fileName, labels.get(label),
-               probabilities[label] * 100.0);
+         List<Probability> result = new ArrayList<>(labels.size());
+         for (int i = 0; i < labels.size(); i++) {
+            result.add(new Probability(labels.get(i), probabilities[i]));
+         }
+         result.sort(new Comparator<Probability>() {
+            @Override
+            public int compare(Probability o1, Probability o2) {
+                return Float.compare(o2.getPercentage(), o1.getPercentage());
+            }
+         });
+         return result;
       }
    }
 
