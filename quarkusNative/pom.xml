@@ -285,11 +285,37 @@
                   <enableHttpUrlHandler>true</enableHttpUrlHandler>
                   <enableJni>true</enableJni>
                   <additionalBuildArgs>
-                    <additionalBuildArg>-H:IncludeResources=.*\.pb|.*\.txt</additionalBuildArg>
+                    <!--<additionalBuildArg>-H:IncludeResources=.*\.pb|.*\.txt</additionalBuildArg>
                     <additionalBuildArg>--initialize-at-run-time=com.sun.jna.platform.mac</additionalBuildArg>
                     <additionalBuildArg>--initialize-at-run-time=com.sun.jna.platform.win32</additionalBuildArg>
-                    <additionalBuildArg>--initialize-at-run-time=oshi.jna.platform.mac</additionalBuildArg>
-                    <additionalBuildArg>--initialize-at-run-time=oshi.jna.platform.win32</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=oshi.</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.nd4j.linalg.dataset.api.preprocessor.VGG16ImagePreProcessor</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.nd4j.linalg.factory.Nd4j</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.nd4j.nativeblas.NativeOpsHolder</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.nd4j.linalg.dataset.api.preprocessor.VGG16ImagePreProcessor</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.nd4j.linalg.factory.Nd4j</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.nd4j.nativeblas.NativeOpsHolder</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.nd4j.linalg.dataset.api.preprocessor.VGG16ImagePreProcessor</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.nd4j.linalg.factory.Nd4j</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.nd4j.nativeblas.NativeOpsHolder</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.javacv.OpenCVFrameConverter</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.leptonica.PIX</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.leptonica.PIXA</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.leptonica.PIXCMAP</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.leptonica.presets.lept</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.opencv.global.opencv_imgcodecs</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.opencv.global.opencv_imgproc</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.opencv.opencv_core.AbstractArray</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.opencv.opencv_core.Rect</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.opencv.opencv_core.Size</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.opencv.presets.opencv_core</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.openblas.presets.openblas_nolapack</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.opencv.opencv_core.CvSlice</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.openblas.presets.openblas_nolapack</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.opencv.opencv_core.CvSlice</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.openblas.presets.openblas_nolapack</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=org.bytedeco.opencv.opencv_core.CvSlice</additionalBuildArg>-->
+
                   </additionalBuildArgs>
                 </configuration>
               </execution>
