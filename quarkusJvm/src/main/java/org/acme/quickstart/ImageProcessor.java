@@ -18,7 +18,7 @@ public final class ImageProcessor
 {
    public static List<Probability> labelImage(InputStream imageStream, int numResults) throws Exception
    {
-	   ZooModel zooModel = new VGG16();
+	   ZooModel zooModel = VGG16.builder().build();
 	   ComputationGraph vgg16 = (ComputationGraph)zooModel.initPretrained(PretrainedType.IMAGENET);
 	   
 	   // Convert file to INDArray
