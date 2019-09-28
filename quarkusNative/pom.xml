@@ -11,6 +11,13 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <deeplearning4j.version>1.0.0-beta5</deeplearning4j.version>
+    <openblas.version>0.3.6-1.5.1</openblas.version> <!-- This needs to be what the deeplearning4j (nd4j) version above expects -->
+    <mkl.version>2019.4-1.5.1</mkl.version> <!-- This needs to be what the deeplearning4j (nd4j) version above expects -->
+    <mkl-dnn.version>0.20-1.5.1</mkl-dnn.version> <!-- This needs to be what the deeplearning4j (nd4j) version above expects -->
+    <opencv.version>4.1.0-1.5.1</opencv.version> <!-- This needs to be what the deeplearning4j (datavec-data-image) version above expects -->
+    <leptonica.version>1.78.0-1.5.1</leptonica.version> <!-- This needs to be what the deeplearning4j (datavec-data-image) version above expects -->
+    <hdf5.version>1.10.5-1.5.1</hdf5.version> <!-- This needs to be what the deeplearning4j (datavec-data-image) version above expects -->
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -46,6 +53,178 @@
       <artifactId>rest-assured</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.nd4j</groupId>
+      <artifactId>nd4j-native-platform</artifactId>
+      <version>${deeplearning4j.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- nd4j transitive dependencies overrides for getting rid of android/ios/windows native libraries -->
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>openblas-platform</artifactId>
+      <version>${openblas.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>openblas</artifactId>
+      <version>${openblas.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>openblas</artifactId>
+      <classifier>linux-x86_64</classifier>
+      <version>${openblas.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>mkl-platform</artifactId>
+      <version>${mkl.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>mkl</artifactId>
+      <version>${mkl.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>mkl</artifactId>
+      <classifier>linux-x86_64</classifier>
+      <version>${mkl.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>mkl-dnn-platform</artifactId>
+      <version>${mkl-dnn.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>mkl-dnn</artifactId>
+      <version>${mkl-dnn.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>mkl-dnn</artifactId>
+      <classifier>linux-x86_64</classifier>
+      <version>${mkl-dnn.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.nd4j</groupId>
+      <artifactId>nd4j-native</artifactId>
+      <version>${deeplearning4j.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.nd4j</groupId>
+      <artifactId>nd4j-native</artifactId>
+      <classifier>linux-x86_64</classifier>
+      <version>${deeplearning4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.deeplearning4j</groupId>
+      <artifactId>deeplearning4j-zoo</artifactId>
+      <version>${deeplearning4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.datavec</groupId>
+      <artifactId>datavec-data-image</artifactId>
+      <version>${deeplearning4j.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.bytedeco</groupId>
+          <artifactId>opencv-platform</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.bytedeco</groupId>
+          <artifactId>leptonica-platform</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.bytedeco</groupId>
+          <artifactId>hdf5-platform</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- datavec-data-image dependencies overrides for getting rid of android/ios/windows native libraries -->
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>opencv-platform</artifactId>
+      <version>${opencv.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>opencv</artifactId>
+      <classifier>linux-x86_64</classifier>
+      <version>${opencv.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>leptonica-platform</artifactId>
+      <version>${leptonica.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>leptonica</artifactId>
+      <classifier>linux-x86_64</classifier>
+      <version>${leptonica.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>hdf5-platform</artifactId>
+      <version>${hdf5.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>hdf5</artifactId>
+      <classifier>linux-x86_64</classifier>
+      <version>${hdf5.version}</version>
+    </dependency>
+    <!-- end of datavec-data-image overrides -->
     <dependency>
       <groupId>org.tensorflow</groupId>
       <artifactId>tensorflow</artifactId>
@@ -107,6 +286,10 @@
                   <enableJni>true</enableJni>
                   <additionalBuildArgs>
                     <additionalBuildArg>-H:IncludeResources=.*\.pb|.*\.txt</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=com.sun.jna.platform.mac</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=com.sun.jna.platform.win32</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=oshi.jna.platform.mac</additionalBuildArg>
+                    <additionalBuildArg>--initialize-at-run-time=oshi.jna.platform.win32</additionalBuildArg>
                   </additionalBuildArgs>
                 </configuration>
               </execution>
