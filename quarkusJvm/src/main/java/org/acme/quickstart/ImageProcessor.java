@@ -16,12 +16,19 @@ import org.nd4j.linalg.factory.Nd4j;
 
 public final class ImageProcessor
 {
-   public static List<Probability> labelImage(InputStream imageStream, int numResults) throws Exception
-   {
+   private static ComputationGraph vgg16 = null;
+   static {
+	   try {
 	   @SuppressWarnings("rawtypes")
 	   ZooModel zooModel = VGG16.builder().build();
-	   ComputationGraph vgg16 = (ComputationGraph)zooModel.initPretrained(PretrainedType.IMAGENET);
-	   
+	   vgg16 = (ComputationGraph)zooModel.initPretrained(PretrainedType.IMAGENET);
+	   } catch (Exception e) {
+		   throw new RuntimeException(e);
+	   }
+   }
+	
+   public static List<Probability> labelImage(InputStream imageStream, int numResults) throws Exception
+   {
 	   // Convert file to INDArray
 	   NativeImageLoader loader = new NativeImageLoader(224, 224, 3);
        INDArray image = loader.asMatrix(imageStream);
