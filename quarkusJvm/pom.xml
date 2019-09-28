@@ -62,17 +62,6 @@
       <artifactId>datavec-data-image</artifactId>
       <version>${deeplearning4j.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.tensorflow</groupId>
-      <artifactId>tensorflow</artifactId>
-      <version>1.13.1</version>
-    </dependency>
-    <!-- For ByteStreams.toByteArray: https://google.github.io/guava/releases/23.0/api/docs/com/google/common/io/ByteStreams.html -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>23.6-jre</version>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
