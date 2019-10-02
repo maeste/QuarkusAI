@@ -27,8 +27,8 @@ public class GreetingResource {
         long before = System.currentTimeMillis();
         InputPart inputPart = input.getFormDataMap().get("file").iterator().next();
         String fileName = parseFileName(inputPart.getHeaders());
-        byte[] bytes = streamToByte(inputPart.getBody(InputStream.class, null), Integer.parseInt(contentLength));
-        List<Probability> probs = LabelImage.labelImage(fileName, bytes).subList(0, results);
+        //byte[] bytes = streamToByte(inputPart.getBody(InputStream.class, null), Integer.parseInt(contentLength));
+        List<Probability> probs = LabelImage.labelImage(fileName, inputPart.getBody(InputStream.class, null)).subList(0, results);
         return new ImageProcessingResult((System.currentTimeMillis() - before), probs);
     }
 
