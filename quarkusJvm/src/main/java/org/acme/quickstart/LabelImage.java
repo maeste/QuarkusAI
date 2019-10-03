@@ -1,5 +1,6 @@
 package org.acme.quickstart;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.BufferedReader;
@@ -66,19 +67,17 @@ public final class LabelImage
 
    private static Tensor<Float> makeImageTensor(InputStream is) throws IOException {
       long millis = System.currentTimeMillis();
-      
-      
-      BufferedImage img = ImageIO.read(is);
-//      //if (img.getType() != BufferedImage.TYPE_3BYTE_BGR) {
-//         BufferedImage newImage = new BufferedImage(
-//                 128, 128, BufferedImage.TYPE_3BYTE_BGR);
-//         Graphics2D g = newImage.createGraphics();
-//         g.drawImage(img, 0, 0, 128, 128, null);
-//         g.dispose();
-//         img = newImage;
-//      //}
 
-      byte[] data = ((DataBufferByte) img.getData().getDataBuffer()).getData();
+
+      BufferedImage img = ImageIO.read(is);
+      Image tmp = img.getScaledInstance(128, 128, Image.SCALE_SMOOTH);
+      BufferedImage dimg = new BufferedImage(128, 128, BufferedImage.TYPE_3BYTE_BGR);
+
+      Graphics2D g2d = dimg.createGraphics();
+      g2d.drawImage(tmp, 0, 0, null);
+      g2d.dispose();
+
+      byte[] data = ((DataBufferByte) dimg.getData().getDataBuffer()).getData();
       // ImageIO.read seems to produce BGR-encoded images, but the model expects RGB.
       data = bgr2rgb(data);
       final long BATCH_SIZE = 1;
