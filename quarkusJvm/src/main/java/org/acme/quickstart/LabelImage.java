@@ -1,13 +1,12 @@
 package org.acme.quickstart;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -15,10 +14,8 @@ import java.util.List;
 import org.tensorflow.Graph;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
-import org.tensorflow.Tensors;
 
 import com.google.common.io.ByteStreams;
-import org.tensorflow.types.UInt8;
 
 import javax.imageio.ImageIO;
 
@@ -68,32 +65,58 @@ public final class LabelImage
    }
 
    private static Tensor<Float> makeImageTensor(InputStream is) throws IOException {
-      long millis = System.currentTimeMillis();BufferedImage img = ImageIO.read(is);
-      //if (img.getType() != BufferedImage.TYPE_3BYTE_BGR) {
-         BufferedImage newImage = new BufferedImage(
-                 256, 256, BufferedImage.TYPE_3BYTE_BGR);
-         Graphics2D g = newImage.createGraphics();
-         g.drawImage(img, 0, 0, 256, 256, null);
-         g.dispose();
-         img = newImage;
-      //}
+      long millis = System.currentTimeMillis();
+      
+      
+      BufferedImage img = ImageIO.read(is);
+//      //if (img.getType() != BufferedImage.TYPE_3BYTE_BGR) {
+//         BufferedImage newImage = new BufferedImage(
+//                 128, 128, BufferedImage.TYPE_3BYTE_BGR);
+//         Graphics2D g = newImage.createGraphics();
+//         g.drawImage(img, 0, 0, 128, 128, null);
+//         g.dispose();
+//         img = newImage;
+//      //}
 
       byte[] data = ((DataBufferByte) img.getData().getDataBuffer()).getData();
       // ImageIO.read seems to produce BGR-encoded images, but the model expects RGB.
-      bgr2rgb(data);
+      data = bgr2rgb(data);
       final long BATCH_SIZE = 1;
       final long CHANNELS = 3;
       long[] shape = new long[] {BATCH_SIZE, 128, 128, CHANNELS};
       System.out.println(System.currentTimeMillis() - millis);
-      return Tensor.create(Float.class, shape, ByteBuffer.wrap(data));
+      
+      float[] fdata = new float[data.length];
+      for (int i = 0; i < data.length; i++) {
+//          fdata[i] = (data[i] & 0xFF) / 0.0900000035763f;
+          fdata[i] = ((data[i] & 0xFF) - 127.5f) / 127.5f;
+      }
+      for (int i = 0; i < 3; i++) {
+    	  System.out.print(" " + fdata[i]);
+      }
+      System.out.println();
+      for (int i = data.length - 3; i < data.length; i++) {
+    	  System.out.print(" " + fdata[i]);
+      }
+      System.out.println();
+      return Tensor.create(shape, FloatBuffer.wrap(fdata));
    }
 
-   private static void bgr2rgb(byte[] data) {
+   private static byte[] bgr2rgb(byte[] data) {
       for (int i = 0; i < data.length; i += 3) {
          byte tmp = data[i];
          data[i] = data[i + 2];
          data[i + 2] = tmp;
       }
+      return data;
+//      byte[] r = new byte[data.length];
+//      for (int j = 0; j < 3; j++) {
+//    	  int k = j*data.length/3;
+//      for (int i = 0; i < data.length; i += 3) {
+//    	  r[k+i/3] = data[i];
+//       }
+//      }
+//      return r;
    }
    private static Tensor<Float> feedAndRun(Session session, Tensor<Float> input)
    {
