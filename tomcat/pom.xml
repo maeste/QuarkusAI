@@ -25,7 +25,7 @@
     <!-- maven-surefire-plugin -->
     <surefire.system.args>${modular.jdk.args} ${modular.jdk.props}</surefire.system.args>
     <maven.javadoc.skip>false</maven.javadoc.skip>
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13.1</junit.version>
   </properties>
 
   <!-- Plugins -->
